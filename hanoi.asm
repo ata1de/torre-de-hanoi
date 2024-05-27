@@ -11,6 +11,9 @@ section .data
         
     msg_prompt db 'Digite a quantidade de discos: ', 0xa
     len_prompt equ $-msg_prompt
+    
+    msg_complete db 'Programa encerrado! ', 0xa
+    len_complete equ $-msg_complete
 
 section .bss
     buffer_discos resb 128
@@ -19,8 +22,7 @@ section .text
 
     global _start
 
-    _start:     
-        push ebp
+    _start:        
         ; Exibir mensagem de prompt
         mov edx, len_prompt        ; comprimento da mensagem
         mov ecx, msg_prompt        ; endereço da mensagem
@@ -72,7 +74,6 @@ section .text
         push dword [ebp+12]        ; empilha a Torre de Origem
         push dword [ebp+8]         ; empilha o número do disco
         call imprime               ; chama a função imprime
-        add esp, 12                ; limpa a pilha
 
         ; Segunda chamada recursiva
         push dword [ebp+12]        ; empilha a Torre Origem
@@ -108,7 +109,7 @@ section .text
         mov ecx, output            ; endereço da mensagem
         mov ebx, 1                 ; saída padrão (stdout)
         mov eax, 4                 ; código para sys_write
-        int 0x80                    ; interrupção para escrever
+        int 128                    ; interrupção para escrever
 
         mov esp, ebp               ; restaura o valor original de esp
         pop ebp                    ; restaura o valor original de ebp
@@ -135,6 +136,9 @@ section .text
             ret                    ; retorna da função
 
     exit:
+        ; Exibir mensagem de conclusão
+        mov edx, len_complete      ; comprimento da mensagem
+        mov ecx, msg_complete      ; endereço da mensagem
         mov ebx, 1                 ; saída padrão (stdout - terminal)
         mov eax, 4                 ; código para sys_write
         int 0x80
@@ -142,4 +146,4 @@ section .text
         ; Sair do programa
         mov eax, 1                 ; código para sys_exit
         mov ebx, 0                 ; código de saída
-        int 0x80                    ; interrupção para sair do programa
+        int 128                    ; interrupção para sair do programa
