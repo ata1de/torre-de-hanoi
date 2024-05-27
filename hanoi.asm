@@ -1,4 +1,3 @@
-
 section .data                         
     output:
                           db        "Mova o disco "   
@@ -12,9 +11,6 @@ section .data
         
     msg_prompt db 'Digite a quantidade de discos: ', 0xa
     len_prompt equ $-msg_prompt
-    
-    msg_complete db 'Parabéns! Você conseguiu solucionar a torre de hanoi! ', 0xa
-    len_complete equ $-msg_complete
 
 section .bss
     buffer_discos resb 128
@@ -23,7 +19,8 @@ section .text
 
     global _start
 
-    _start:        
+    _start:     
+        push ebp
         ; Exibir mensagem de prompt
         mov edx, len_prompt        ; comprimento da mensagem
         mov ecx, msg_prompt        ; endereço da mensagem
@@ -69,7 +66,6 @@ section .text
         dec eax                    ; decrementa o número de discos
         push dword eax             ; empilha o número de discos restantes
         call hanoi                 ; chama a função hanoi recursivamente
-        add esp, 16                ; limpa a pilha
 
         ; Imprimir movimento
         push dword [ebp+16]        ; empilha a Torre de Destino
@@ -112,7 +108,7 @@ section .text
         mov ecx, output            ; endereço da mensagem
         mov ebx, 1                 ; saída padrão (stdout)
         mov eax, 4                 ; código para sys_write
-        int 128                    ; interrupção para escrever
+        int 0x80                    ; interrupção para escrever
 
         mov esp, ebp               ; restaura o valor original de esp
         pop ebp                    ; restaura o valor original de ebp
@@ -139,9 +135,6 @@ section .text
             ret                    ; retorna da função
 
     exit:
-        ; Exibir mensagem de conclusão
-        mov edx, len_complete      ; comprimento da mensagem
-        mov ecx, msg_complete      ; endereço da mensagem
         mov ebx, 1                 ; saída padrão (stdout - terminal)
         mov eax, 4                 ; código para sys_write
         int 0x80
@@ -149,4 +142,4 @@ section .text
         ; Sair do programa
         mov eax, 1                 ; código para sys_exit
         mov ebx, 0                 ; código de saída
-        int 128                    ; interrupção para sair do programa
+        int 0x80                    ; interrupção para sair do programa
